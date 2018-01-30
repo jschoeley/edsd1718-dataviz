@@ -30,7 +30,7 @@ library(tidyverse)
 #' We work with data from the [Human Mortality
 #' Database](http://www.mortality.org) -- Swedish period mortality rates by sex.
 
-swe <- read_csv("mortality_surface_sweden.csv")
+swe <- read_csv("https://github.com/jschoeley/edsd1718-dataviz/raw/master/data/sweden.csv")
 head(swe)
 
 #' Only specifying x and y position and omitting colour puts a grey rectangle at
@@ -78,7 +78,7 @@ swe %>% filter(Sex == "Female") %>%
 #' the `width` and/or `height` of the rectangles. `width` and `height` are
 #' regular aesthetics and can be mapped to variables in the data.
 
-cod <- read_csv("cod.csv")
+cod <- read_csv("https://raw.githubusercontent.com/jschoeley/edsd1718-dataviz/master/data/cod.csv")
 head(cod)
 
 #' The Cause of Death data features age groups of different sizes (1, 4, or 5
