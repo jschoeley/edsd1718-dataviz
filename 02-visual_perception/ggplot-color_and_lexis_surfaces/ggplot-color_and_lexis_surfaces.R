@@ -65,12 +65,14 @@ swe %>% filter(Sex == "Female") %>%
 #' Shifting the data by 0.5 in x and y aligns things neatly.
 
 swe %>% filter(Sex == "Female") %>%
-  mutate(Year = Year + 0.5, Age = Age + 0.5) %>%
+  mutate(Year = Year+0.5, Age = Age+0.5) %>%
   ggplot() +
-  geom_tile(aes(x = Year, y = Age), colour = "white") +
+  geom_tile(aes(x = Year, y = Age),
+            colour = "white") +
   scale_x_continuous(breaks = 1800:1810) +
   scale_y_continuous(breaks = 100:110) +
-  coord_equal(xlim = c(1800, 1810), ylim = c(100, 110))
+  coord_equal(xlim = c(1800, 1810),
+              ylim = c(100, 110))
 
 #'### nxm year data
 
@@ -78,8 +80,9 @@ swe %>% filter(Sex == "Female") %>%
 #' the `width` and/or `height` of the rectangles. `width` and `height` are
 #' regular aesthetics and can be mapped to variables in the data.
 
-cod <- read_csv("https://raw.githubusercontent.com/jschoeley/edsd1718-dataviz/master/data/cod.csv")
+cod <- read_csv("https://raw.githubusercontent.com/jschoeley/edsd1718-dataviz/master/02-visual_perception/ggplot-color_and_lexis_surfaces/cod.csv")
 head(cod)
+cod %>% View
 
 #' The Cause of Death data features age groups of different sizes (1, 4, or 5
 #' years). This is how it looks like if we plot it without any regard to the
@@ -163,7 +166,9 @@ swe %>%
   mutate(Year = Year + 0.5, Age = Age + 0.5) %>%
   ggplot() +
   geom_tile(aes(x = Year, y = Age, fill = mx)) +
-  scale_fill_distiller(type = "seq", palette = "PuBuGn", trans = "log10",
+  scale_fill_distiller(type = "seq",
+                       palette = "PuBuGn",
+                       trans = "log10",
                        direction = 1) +
   facet_wrap(~Sex, ncol = 1) +
   coord_equal()
@@ -174,9 +179,13 @@ swe %>%
   mutate(Year = Year + 0.5, Age = Age + 0.5) %>%
   ggplot() +
   geom_tile(aes(x = Year, y = Age, fill = mx)) +
-  scale_fill_distiller(type = "seq", palette = "PuBuGn", trans = "log10",
+  scale_fill_distiller(type = "seq",
+                       palette = "PuBuGn", 
+                       trans = "log10",
                        direction = 1,
-                       values = c(0, 0.3, 0.4, 0.5, 0.6, 1)) +
+                       values =
+                         c(0, 0.3, 0.4,
+                           0.5, 0.6, 1)) +
   facet_wrap(~Sex, ncol = 1) +
   coord_equal()
 
@@ -188,8 +197,11 @@ swe %>%
   geom_tile(aes(x = Year, y = Age, fill = mx)) +
   scale_fill_distiller(type = "seq", palette = "PuBuGn", trans = "log10",
                        direction = 1,
-                       values = c(0, 0.3, 0.4, 0.5, 0.6, 1),
-                       limits = c(0.001, 0.5)) +
+                       values =
+                         c(0, 0.3, 0.4,
+                           0.5, 0.6, 1),
+                       limits = c(0.001,
+                                  0.5)) +
   facet_wrap(~Sex, ncol = 1) +
   coord_equal()
 
@@ -201,8 +213,11 @@ swe %>%
   geom_tile(aes(x = Year, y = Age, fill = mx)) +
   scale_fill_distiller(type = "seq", palette = "PuBuGn", trans = "log10",
                        direction = 1,
-                       values = c(0, 0.3, 0.4, 0.5, 0.6, 1),
-                       limits = c(0.001, 0.5),
+                       values =
+                         c(0, 0.3, 0.4,
+                           0.5, 0.6, 1),
+                       limits =
+                         c(0.001, 0.5),
                        oob = scales::squish) +
   facet_wrap(~Sex, ncol = 1) +
   coord_equal()
@@ -213,27 +228,34 @@ swe %>%
 swe %>%
   mutate(Year = Year + 0.5, Age = Age + 0.5) %>%
   ggplot() +
-  geom_tile(aes(x = Year, y = Age, fill = mx)) +
-  viridis::scale_fill_viridis(direction = -1,
-                              trans = "log10",
-                              option = "magma",
-                              limits = c(0.001, 0.5),
-                              oob = scales::squish) +
+  geom_tile(aes(x = Year,
+                y = Age, fill = mx)) +
+  viridis::scale_fill_viridis(
+    direction = -1,
+    trans = "log10",
+    option = "magma",
+    limits = c(0.001, 0.5),
+    oob = scales::squish) +
   facet_wrap(~Sex, ncol = 1) +
   coord_equal()
 
 #'## Divergent Colour Scales: Plotting Differences & Proportions
 
-breaks_prop_mx <- c(0, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, Inf)
+breaks_prop_mx <- c(0, 0.5, 0.7, 0.9,
+                    1.1, 1.3, 1.5, Inf)
 swe %>%
-  mutate(Year = Year + 0.5, Age = Age + 0.5) %>%
+  mutate(Year = Year + 0.5,
+         Age = Age + 0.5) %>%
   select(-Dx, -Nx) %>%
-  tidyr::spread(key = Sex, value = mx) %>%
+  spread(key = Sex, value = mx) %>%
   mutate(fm_prop_mx = Female / Male,
          fm_prop_mx_disc = cut(fm_prop_mx, breaks_prop_mx)) %>%
   ggplot() +
   geom_tile(aes(x = Year, y = Age, fill = fm_prop_mx_disc)) +
-  scale_fill_brewer(type = "div", palette = 5, direction = -1) +
+  scale_fill_brewer(type = "div",
+                    palette = 5,
+                    direction = -1
+                    ) +
   guides(fill = guide_legend(reverse = TRUE)) +
   coord_equal() +
   theme_dark()
@@ -241,7 +263,8 @@ swe %>%
 #' Continuous variant.
 
 swe %>%
-  mutate(Year = Year + 0.5, Age = Age + 0.5) %>%
+  mutate(Year = Year + 0.5,
+         Age = Age + 0.5) %>%
   select(-Dx, -Nx) %>%
   tidyr::spread(key = Sex, value = mx) %>%
   mutate(fm_diff_mx = Female / Male) %>%
