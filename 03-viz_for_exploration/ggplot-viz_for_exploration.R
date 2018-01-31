@@ -6,9 +6,11 @@ library(plotly)
 
 load('infant.RData')
 
-infant <- ideath %>% sample_frac(0.1)
-
 infant %>% View()
+
+infant <-
+  infant %>%
+  mutate(death = ifelse(is.na(age_at_death_d), FALSE, TRUE))
 
 # NAs ---------------------------------------------------------------------
 
@@ -61,11 +63,52 @@ infant %>%
 #'   - prenatal care
 #' - Missings depend on year and origin of mother
 
-# Infant mortality rates by year and strata -------------------------------
+# Gestation at birth ------------------------------------------------------
 
-infant <-
-  infant %>%
-  mutate(death = ifelse(is.na(age_at_death_d), FALSE, TRUE))
+infant %>%
+  ggplot(aes(x = gestation_at_delivery_w)) +
+  geom_histogram(aes(y = ..density..)) +
+  facet_wrap(~date_of_delivery_y)
+
+infant %>%
+  group_by(date_of_delivery_y) %>%
+  summarise(p = sum(gestation_at_delivery_w > 42, na.rm = TRUE)/n()) %>% 
+  ggplot(aes(x = date_of_delivery_y, y = p)) +
+  geom_line() +
+  geom_point()
+
+infant %>%
+  group_by(date_of_delivery_y) %>%
+  summarise(p = sum(gestation_at_delivery_w < 38, na.rm = TRUE)/n()) %>% 
+  ggplot(aes(x = date_of_delivery_y, y = p)) +
+  geom_line() +
+  geom_point()
+
+infant %>%
+  group_by(date_of_delivery_y) %>%
+  summarise(p = sum(gestation_at_delivery_w == 40, na.rm = TRUE)/n()) %>% 
+  ggplot(aes(x = date_of_delivery_y, y = p)) +
+  geom_line() +
+  geom_point()
+
+# Sex ratio at birth ------------------------------------------------------
+
+infant %>%
+  group_by(date_of_delivery_y, race_and_hispanic_orig_of_mother_c4) %>%
+  summarise(sr = sum(sex == 'Male')/sum(sex == 'Female')) %>% 
+  ggplot(aes(x = date_of_delivery_y, y = sr)) +
+  geom_line(aes(color = race_and_hispanic_orig_of_mother_c4))
+
+infant %>%
+  group_by(race_and_hispanic_orig_of_mother_c4,
+           education_of_mother_c4) %>%
+  summarise(sr = sum(sex == 'Male')/sum(sex == 'Female')) %>%
+  ggplot(aes(x = education_of_mother_c4, y = sr)) +
+  geom_point(aes(color = race_and_hispanic_orig_of_mother_c4)) +
+  coord_flip() +
+  scale_y_continuous(limits = c(0.9 ,1.1))
+
+# Infant mortality rates by year and strata -------------------------------
 
 infant %>%
   group_by(date_of_delivery_y) %>%
@@ -142,50 +185,7 @@ infant %>%
                       ymax = estimate+1.96*std.error)) +
   coord_flip()
   
-# Sex ratio at birth ------------------------------------------------------
-
-infant %>%
-  group_by(date_of_delivery_y, race_and_hispanic_orig_of_mother_c4) %>%
-  summarise(sr = sum(sex == 'Male')/sum(sex == 'Female')) %>% 
-  ggplot(aes(x = date_of_delivery_y, y = sr)) +
-  geom_line(aes(color = race_and_hispanic_orig_of_mother_c4))
-
-infant %>%
-  group_by(race_and_hispanic_orig_of_mother_c4,
-           education_of_mother_c4) %>%
-  summarise(sr = sum(sex == 'Male')/sum(sex == 'Female')) %>%
-  ggplot(aes(x = education_of_mother_c4, y = sr)) +
-  geom_point(aes(color = race_and_hispanic_orig_of_mother_c4)) +
-  coord_flip() +
-  scale_y_continuous(limits = c(0.9 ,1.1))
-
-# Gestation at birth ------------------------------------------------------
-
-infant %>%
-  ggplot(aes(x = gestation_at_delivery_w)) +
-  geom_histogram(aes(y = ..density..)) +
-  facet_wrap(~date_of_delivery_y)
-
-infant %>%
-  group_by(date_of_delivery_y) %>%
-  summarise(p = sum(gestation_at_delivery_w > 42, na.rm = TRUE)/n()) %>% 
-  ggplot(aes(x = date_of_delivery_y, y = p)) +
-  geom_line() +
-  geom_point()
-
-infant %>%
-  group_by(date_of_delivery_y) %>%
-  summarise(p = sum(gestation_at_delivery_w < 38, na.rm = TRUE)/n()) %>% 
-  ggplot(aes(x = date_of_delivery_y, y = p)) +
-  geom_line() +
-  geom_point()
-
-infant %>%
-  group_by(date_of_delivery_y) %>%
-  summarise(p = sum(gestation_at_delivery_w == 40, na.rm = TRUE)/n()) %>% 
-  ggplot(aes(x = date_of_delivery_y, y = p)) +
-  geom_line() +
-  geom_point()
+# Relationship between level and distribution of infant mortality ---------
 
 infant %>%
   group_by(date_of_delivery_ym) %>%
